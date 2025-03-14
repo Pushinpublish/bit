@@ -1,6 +1,7 @@
 import React, { useMemo, ReactNode } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import classnames from 'classnames';
+import { useQuery } from '@teambit/ui-foundation.ui.react-router.use-query';
 import { compact, flatten, groupBy, isFunction, orderBy } from 'lodash';
 import * as semver from 'semver';
 import { SlotRegistry } from '@teambit/harmony';
@@ -14,10 +15,12 @@ import { useLanes as defaultUseLanes } from '@teambit/lanes.hooks.use-lanes';
 import { LanesModel } from '@teambit/lanes.ui.models.lanes-model';
 import { Menu as ConsumeMethodsMenu } from '@teambit/ui-foundation.ui.use-box.menu';
 import { LegacyComponentLog } from '@teambit/legacy-component-log';
+import { useWorkspaceMode } from '@teambit/workspace.ui.use-workspace-mode';
 import { useComponent as useComponentQuery, UseComponentType, Filters } from '../use-component';
 import { CollapsibleMenuNav } from './menu-nav';
-import { OrderedNavigationSlot, ConsumeMethodSlot, ConsumePluginProps } from './nav-plugin';
+import { OrderedNavigationSlot, ConsumeMethodSlot, ConsumePluginProps, NavPlugin, NavPluginProps } from './nav-plugin';
 import { useIdFromLocation } from '../use-component-from-location';
+import { TopBarNav } from '../top-bar-nav';
 
 import styles from './menu.module.scss';
 
@@ -42,7 +45,10 @@ export type MenuProps = {
    * right side navigation menu item slot
    */
   widgetSlot: OrderedNavigationSlot;
-
+  /**
+   * pinned widgets slots - right side of the widget slot
+   */
+  pinnedWidgetSlot: OrderedNavigationSlot;
   /**
    * right side menu item slot
    */
@@ -84,7 +90,7 @@ export function ComponentMenu({
   navigationSlot,
   widgetSlot,
   className,
-  host,
+  host: hostFromProps,
   menuItemSlot,
   consumeMethodSlot,
   rightSideMenuSlot,
@@ -95,7 +101,9 @@ export function ComponentMenu({
   path,
   useComponentFilters,
   authToken,
+  pinnedWidgetSlot,
 }: MenuProps) {
+  const { isMinimal } = useWorkspaceMode();
   const idFromLocation = useIdFromLocation();
   const componentIdStrWithScopeFromLocation = useIdFromLocation(undefined, true);
   const _componentIdStr = getComponentIdStr(componentIdStr);
@@ -103,7 +111,13 @@ export function ComponentMenu({
   const resolvedComponentIdStr = path || idFromLocation;
   const mainMenuItems = useMemo(() => groupBy(flatten(menuItemSlot.values()), 'category'), [menuItemSlot]);
   const rightSideItems = useMemo(() => orderBy(flatten(rightSideMenuSlot.values()), 'order'), [rightSideMenuSlot]);
+  const pinnedWidgets = useMemo(
+    () => flatten(pinnedWidgetSlot.toArray().sort(sortFn).map(([, pinnedWidget]) => pinnedWidget)), [pinnedWidgetSlot]);
   const componentFilters = useComponentFilters?.() || {};
+  const query = useQuery();
+  const componentVersion = query.get('version');
+  const host = componentVersion ? 'teambit.scope/scope' : hostFromProps
+
   const useComponentVersions = defaultLoadVersions(
     host,
     componentId?.toString() || componentIdStrWithScopeFromLocation,
@@ -116,16 +130,16 @@ export function ComponentMenu({
       {RightNode || (
         <>
           <VersionRelatedDropdowns
-            host={host}
+            host={hostFromProps}
             consumeMethods={consumeMethodSlot}
             componentId={componentId?.toString() || idFromLocation}
             useComponent={useComponentVersions}
             componentFilters={componentFilters}
             authToken={authToken}
-            // loading={loading}
+          // loading={loading}
           />
           {rightSideItems.map(({ item }) => item)}
-          <MainDropdown className={styles.hideOnMobile} menuItems={mainMenuItems} />
+          {!isMinimal && <MainDropdown className={styles.hideOnMobile} menuItems={mainMenuItems} />}
         </>
       )}
     </div>
@@ -140,6 +154,7 @@ export function ComponentMenu({
             <div className={styles.leftSide}>
               <CollapsibleMenuNav navigationSlot={navigationSlot} widgetSlot={widgetSlot} />
             </div>
+            {isMinimal && pinnedWidgets.map(pinnedWidget => <PinnedWidgetComponent key={`key-${pinnedWidget.order}`} {...pinnedWidget.props} />)}
             {!skipRightSide && <div className={styles.rightSide}>{RightSide}</div>}
           </div>
         }
@@ -246,7 +261,7 @@ export function defaultLoadVersions(
         buildStatus: component?.buildStatus,
       };
     },
-    [componentId, loadingFromProps, componentFilters]
+    [componentId, loadingFromProps, componentFilters, host]
   );
 }
 
@@ -305,12 +320,12 @@ export function VersionRelatedDropdowns(props: VersionRelatedDropdownsProps) {
   const consumeMethodProps: ConsumePluginProps | undefined = React.useMemo(() => {
     return id
       ? {
-          id,
-          packageName: packageName ?? '',
-          latest,
-          options: { viewedLane, disableInstall: !packageName },
-          authToken,
-        }
+        id,
+        packageName: packageName ?? '',
+        latest,
+        options: { viewedLane, disableInstall: !packageName },
+        authToken,
+      }
       : undefined;
   }, [id, packageName, latest, viewedLane, authToken]);
   const methods = useConsumeMethods(consumeMethods, consumeMethodProps);
@@ -358,5 +373,22 @@ function useConsumeMethods(
         })
         .filter((x) => !!x && x.Component && x.Title) as ConsumeMethod[],
     [consumeMethods, consumePluginProps]
+  );
+}
+
+
+function sortFn([, { order: first }]: [string, NavPlugin], [, { order: second }]: [string, NavPlugin]) {
+  return (first ?? 0) - (second ?? 0);
+}
+
+function PinnedWidgetComponent(menuItemProps: NavPluginProps) {
+  return (
+    <TopBarNav
+      {...menuItemProps}
+      style={{ ...menuItemProps.style, height: '100%' }}
+      className={classnames(menuItemProps?.className)}
+    >
+      {menuItemProps?.children}
+    </TopBarNav>
   );
 }

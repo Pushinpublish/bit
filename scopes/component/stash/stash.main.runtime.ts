@@ -2,10 +2,10 @@ import { WorkspaceAspect, Workspace } from '@teambit/workspace';
 import { SnappingAspect, SnappingMain } from '@teambit/snapping';
 import { Component, ComponentID } from '@teambit/component';
 import { BitError } from '@teambit/bit-error';
-import ConsumerComponent from '@teambit/legacy/dist/consumer/component';
+import { ConsumerComponent } from '@teambit/legacy.consumer-component';
 import { compact } from 'lodash';
 import { CLIAspect, CLIMain, MainRuntime } from '@teambit/cli';
-import { Ref } from '@teambit/legacy/dist/scope/objects';
+import { Ref } from '@teambit/objects';
 import { CheckoutAspect, CheckoutMain, CheckoutProps } from '@teambit/checkout';
 import { StashAspect } from './stash.aspect';
 import { StashCmd, StashListCmd, StashLoadCmd, StashSaveCmd } from './stash.cmd';
@@ -138,9 +138,8 @@ export class StashMain {
     if (!consumerComponent.log) {
       consumerComponent.log = await getBasicLog();
     }
-    const { version, files } = await this.workspace.scope.legacyScope.sources.consumerComponentToVersion(
-      consumerComponent
-    );
+    const { version, files } =
+      await this.workspace.scope.legacyScope.sources.consumerComponentToVersion(consumerComponent);
     if (previousVersion) {
       // set the parent, we need it for the "stash-load" to function as the "base" version for the three-way-merge.
       const modelComponent = consumerComponent.modelComponent;
@@ -163,7 +162,7 @@ export class StashMain {
     Workspace,
     CheckoutMain,
     SnappingMain,
-    RemoveMain
+    RemoveMain,
   ]) {
     const stashMain = new StashMain(workspace, checkout, snapping, remove);
     const stashCmd = new StashCmd(stashMain);

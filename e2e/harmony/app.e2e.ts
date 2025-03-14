@@ -1,5 +1,5 @@
 import chai, { expect } from 'chai';
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 
@@ -14,7 +14,7 @@ describe('app command', function () {
   });
   describe('app run', () => {
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes({ addRemoteScopeAsDefaultScope: false });
+      helper.scopeHelper.setWorkspaceWithRemoteScope({ addRemoteScopeAsDefaultScope: false });
       helper.command.create('express-server', 'my-app', '--env teambit.harmony/node');
       helper.command.compile();
       helper.command.install();

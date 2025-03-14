@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import fs from 'fs-extra';
 import * as path from 'path';
 
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 
@@ -18,7 +18,7 @@ describe('big text file', function () {
   describe('Windows format (\\r\\n)', () => {
     let tagOutput;
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       const bigFilePath = path.join(__dirname, '..', 'fixtures', 'big-text-file-fixture.txt');
       const bigFileContent = fs.readFileSync(bigFilePath).toString();
       const windowsFormatContent = bigFileContent.replace(/\r\n|\r|\n/g, '\r\n');
@@ -34,7 +34,7 @@ describe('big text file', function () {
       let importOutput;
       before(() => {
         helper.command.export();
-        helper.scopeHelper.reInitLocalScope();
+        helper.scopeHelper.reInitWorkspace();
         helper.scopeHelper.addRemoteScope();
         importOutput = helper.command.importComponent('bar/text');
       });

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 describe('log', function () {
   this.timeout(0);
@@ -12,7 +12,7 @@ describe('log', function () {
   });
   describe('logging with global --log flag', () => {
     before(() => {
-      helper.scopeHelper.reInitLocalScope();
+      helper.scopeHelper.reInitWorkspace();
     });
     it('should log successfully', () => {
       const output = helper.command.runCmd('bit status --log');

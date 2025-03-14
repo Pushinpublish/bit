@@ -2,9 +2,7 @@ import chai, { expect } from 'chai';
 import fs from 'fs-extra';
 import * as path from 'path';
 
-import Helper from '../../src/e2e-helper/e2e-helper';
-import { DEFAULT_OWNER } from '../../src/e2e-helper/e2e-scopes';
-import * as fixtures from '../../src/fixtures/fixtures';
+import { Helper, fixtures, DEFAULT_OWNER } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 
@@ -24,7 +22,7 @@ describe('set default owner and scope', function () {
     let componentId;
     let componentPackageName;
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes({ addRemoteScopeAsDefaultScope: false });
+      helper.scopeHelper.setWorkspaceWithRemoteScope({ addRemoteScopeAsDefaultScope: false });
       scopeWithoutOwner = helper.scopes.remoteWithoutOwner;
       defaultScope = helper.scopes.remote;
       componentId = `${defaultScope}/utils/is-type`;
@@ -73,7 +71,7 @@ describe('set default owner and scope', function () {
       });
       describe('post import', () => {
         before(() => {
-          helper.scopeHelper.reInitLocalScope();
+          helper.scopeHelper.reInitWorkspace();
           helper.scopeHelper.addRemoteScope();
           helper.command.importComponent('utils/is-type');
         });

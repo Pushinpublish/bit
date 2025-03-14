@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import { loadBit } from '@teambit/bit';
 import { Workspace, WorkspaceAspect } from '@teambit/workspace';
 import { Component } from '@teambit/component';
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 chai.use(require('chai-string'));
@@ -20,7 +20,7 @@ describe('workspace aspect', function () {
   describe('tag a component twice', () => {
     before(() => {
       helper = new Helper();
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       helper.fixtures.populateComponents(1);
       helper.command.tagAllWithoutBuild(); // 0.0.1
       helper.fixtures.populateComponents(1, undefined, 'v2');

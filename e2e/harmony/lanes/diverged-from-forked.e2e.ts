@@ -1,5 +1,5 @@
 import chai, { expect } from 'chai';
-import Helper from '../../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 
@@ -10,7 +10,7 @@ describe('lane-b was forked from lane-a and they are now diverged', function () 
   let headOnLaneB: string;
   before(() => {
     helper = new Helper();
-    helper.scopeHelper.setNewLocalAndRemoteScopes();
+    helper.scopeHelper.setWorkspaceWithRemoteScope();
     helper.command.createLane('lane-a');
     helper.fixtures.populateComponents(1, false);
     helper.command.snapAllComponentsWithoutBuild();

@@ -1,4 +1,5 @@
 import { MainRuntime } from '@teambit/cli';
+import { ComponentID } from '@teambit/component-id';
 import { CompilerAspect, CompilerMain } from '@teambit/compiler';
 import { InstallAspect, InstallMain } from '@teambit/install';
 import { Logger, LoggerAspect, LoggerMain } from '@teambit/logger';
@@ -9,7 +10,7 @@ import { uniq } from 'lodash';
 import mapSeries from 'p-map-series';
 import * as path from 'path';
 import { MoverAspect, MoverMain } from '@teambit/mover';
-import ConsumerComponent from '@teambit/legacy/dist/consumer/component';
+import { ConsumerComponent } from '@teambit/legacy.consumer-component';
 import {
   isDir,
   isDirEmptySync,
@@ -18,11 +19,11 @@ import {
   PathOsBasedAbsolute,
 } from '@teambit/legacy.utils';
 import { ComponentMap } from '@teambit/legacy.bit-map';
-import { COMPONENT_CONFIG_FILE_NAME } from '@teambit/legacy/dist/constants';
+import { COMPONENT_CONFIG_FILE_NAME } from '@teambit/legacy.constants';
 import { DataToPersist } from '@teambit/component.sources';
 import { ConfigMergerAspect, ConfigMergerMain, WorkspaceConfigUpdateResult } from '@teambit/config-merger';
 import { MergeStrategy } from '@teambit/merging';
-import Consumer from '@teambit/legacy/dist/consumer/consumer';
+import { Consumer } from '@teambit/legacy.consumer';
 import ComponentWriter, { ComponentWriterProps } from './component-writer';
 import { ComponentWriterAspect } from './component-writer.aspect';
 
@@ -79,7 +80,10 @@ export class ComponentWriterMain {
       );
     }
     if (!opts.skipDependencyInstallation) {
-      installationError = await this.installPackagesGracefully(opts.skipWriteConfigFiles);
+      installationError = await this.installPackagesGracefully(
+        opts.components.map(({ id }) => id),
+        opts.skipWriteConfigFiles
+      );
       // no point to compile if the installation is not running. the environment is not ready.
       compilationError = await this.compileGracefully();
     }
@@ -87,7 +91,10 @@ export class ComponentWriterMain {
     return { installationError, compilationError, workspaceConfigUpdateResult };
   }
 
-  private async installPackagesGracefully(skipWriteConfigFiles = false): Promise<Error | undefined> {
+  private async installPackagesGracefully(
+    componentIds: ComponentID[],
+    skipWriteConfigFiles = false
+  ): Promise<Error | undefined> {
     this.logger.debug('installPackagesGracefully, start installing packages');
     try {
       const installOpts = {
@@ -95,6 +102,7 @@ export class ComponentWriterMain {
         updateExisting: false,
         import: false,
         writeConfigFiles: !skipWriteConfigFiles,
+        dependenciesGraph: await this.workspace.scope.getDependenciesGraphByComponentIds(componentIds),
       };
       await this.installer.install(undefined, installOpts);
       this.logger.debug('installPackagesGracefully, completed installing packages successfully');
@@ -244,14 +252,13 @@ export class ComponentWriterMain {
       const componentMap = this.consumer.bitMap.getComponentIfExist(component.id, {
         ignoreVersion: true,
       });
-      this.throwErrorWhenDirectoryNotEmpty(this.consumer.toAbsolutePath(componentRootDir), componentMap, opts);
+      this.throwErrorWhenDirectoryNotEmpty(componentRootDir, componentMap, opts);
       return {
         existingComponentMap: componentMap,
       };
     };
     return {
       workspace: this.workspace,
-      // @ts-ignore todo: remove after deleting teambit.legacy
       bitMap: this.consumer.bitMap,
       component,
       writeToPath: componentRootDir,
@@ -281,7 +288,7 @@ to move all component files to a different directory, run bit remove and then bi
     }
   }
   private throwErrorWhenDirectoryNotEmpty(
-    componentDir: PathOsBasedAbsolute,
+    componentDirRelative: PathOsBasedAbsolute,
     componentMap: ComponentMap | null | undefined,
     opts: ManyComponentsWriterParams
   ) {
@@ -292,15 +299,24 @@ to move all component files to a different directory, run bit remove and then bi
     // if writeToPath specified and that directory is already used for that component, it's ok to override
     if (opts.writeToPath && componentMap && componentMap.rootDir && componentMap.rootDir === opts.writeToPath) return;
 
-    if (fs.pathExistsSync(componentDir)) {
-      if (!isDir(componentDir)) {
-        throw new BitError(`unable to import to ${componentDir} because it's a file`);
-      }
-      if (!isDirEmptySync(componentDir) && opts.throwForExistingDir) {
+    const componentDir = this.consumer.toAbsolutePath(componentDirRelative);
+    if (!fs.pathExistsSync(componentDir)) return;
+    if (!componentMap) {
+      const compInTheSameDir = this.consumer.bitMap.getComponentIdByRootPath(componentDirRelative);
+      if (compInTheSameDir) {
         throw new BitError(
-          `unable to import to ${componentDir}, the directory is not empty. use --override flag to delete the directory and then import`
+          `unable to import to ${componentDir}, the directory is already used by ${compInTheSameDir.toString()}.
+either use --path to specify a different directory or modify "defaultDirectory" prop in the workspace.jsonc file to "{scopeId}/{name}"`
         );
       }
+    }
+    if (!isDir(componentDir)) {
+      throw new BitError(`unable to import to ${componentDir} because it's a file`);
+    }
+    if (!isDirEmptySync(componentDir) && opts.throwForExistingDir) {
+      throw new BitError(
+        `unable to import to ${componentDir}, the directory is not empty. use --override flag to delete the directory and then import`
+      );
     }
   }
 

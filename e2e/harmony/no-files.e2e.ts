@@ -1,7 +1,6 @@
 import chai, { expect } from 'chai';
-import Helper from '../../src/e2e-helper/e2e-helper';
-import ComponentNotFoundInPath from '../../src/consumer/component/exceptions/component-not-found-in-path';
-import { IgnoredDirectory } from '../../src/consumer/component/exceptions/ignored-directory';
+import { Helper } from '@teambit/legacy.e2e-helper';
+import { IgnoredDirectory, ComponentNotFoundInPath } from '@teambit/legacy.consumer-component';
 
 chai.use(require('chai-fs'));
 chai.use(require('chai-string'));
@@ -17,7 +16,7 @@ describe('component files are missing', function () {
   });
   describe('component directory were deleted', () => {
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       helper.fixtures.populateComponents(1);
       helper.command.status(); // warm the cache
       helper.fs.deletePath('comp1');
@@ -38,7 +37,7 @@ describe('component files are missing', function () {
   });
   describe('component files were deleted', () => {
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       helper.fixtures.populateComponents(1);
       helper.command.status(); // warm the cache
       helper.fs.deletePath('comp1/index.js');
@@ -59,7 +58,7 @@ describe('component files are missing', function () {
   });
   describe('component directory is ignored by .gitignore', () => {
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       helper.fixtures.populateComponents(1);
       helper.command.status(); // warm the cache
       helper.fs.outputFile('.gitignore', 'comp1');

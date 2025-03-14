@@ -3,9 +3,8 @@ import fs from 'fs-extra';
 import * as path from 'path';
 
 import { MissingBitMapComponent } from '@teambit/legacy.bit-map';
-import Helper from '../../src/e2e-helper/e2e-helper';
-import * as fixtures from '../../src/fixtures/fixtures';
-import { VersionNotFound } from '../../src/scope/exceptions';
+import { Helper, fixtures } from '@teambit/legacy.e2e-helper';
+import { VersionNotFound } from '@teambit/legacy.scope';
 
 const barFooV1 = "module.exports = function foo() { return 'got foo'; };\n";
 const barFooV2 = "module.exports = function foo() { return 'got foo v2'; };\n";
@@ -21,7 +20,7 @@ describe('bit diff command', function () {
   });
   const barFooFile = 'foo.js';
   before(() => {
-    helper.scopeHelper.reInitLocalScope();
+    helper.scopeHelper.reInitWorkspace();
   });
   after(() => {
     helper.scopeHelper.destroy();
@@ -100,7 +99,7 @@ describe('bit diff command', function () {
   });
   describe('when there are several modified components and non modified components', () => {
     before(() => {
-      helper.scopeHelper.reInitLocalScope();
+      helper.scopeHelper.reInitWorkspace();
       helper.fixtures.createComponentBarFoo(barFooV1);
       helper.fixtures.addComponentBarFoo();
       helper.fixtures.createComponentIsType();
@@ -145,7 +144,7 @@ describe('bit diff command', function () {
   describe('when a file is deleted and another is added', () => {
     let output;
     before(() => {
-      helper.scopeHelper.reInitLocalScope();
+      helper.scopeHelper.reInitWorkspace();
       helper.fixtures.createComponentBarFoo(barFooV1);
       helper.fixtures.addComponentBarFoo();
       helper.command.tagAllComponents();
@@ -255,7 +254,7 @@ describe('bit diff command', function () {
   });
   describe('component with multiple versions', () => {
     before(() => {
-      helper.scopeHelper.reInitLocalScope();
+      helper.scopeHelper.reInitWorkspace();
       helper.fixtures.createComponentBarFoo(barFooV1);
       helper.fixtures.addComponentBarFoo();
       helper.fixtures.tagComponentBarFoo(); // 0.0.1

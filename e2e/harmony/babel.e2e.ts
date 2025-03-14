@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import fs from 'fs-extra';
 import path from 'path';
 
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 chai.use(require('chai-string'));
@@ -22,7 +22,7 @@ describe('babel compiler', function () {
     describe('compile simple javascript component', () => {
       let distDir;
       before(() => {
-        helper.scopeHelper.setNewLocalAndRemoteScopes();
+        helper.scopeHelper.setWorkspaceWithRemoteScope();
 
         // add a new env that compiles with Babel
         helper.fixtures.copyFixtureExtensions(EXTENSIONS_BASE_FOLDER);

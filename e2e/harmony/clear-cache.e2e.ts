@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import { expect } from 'chai';
 import { glob } from 'glob';
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 describe('bit clear-cache', function () {
   this.timeout(0);
@@ -16,7 +16,7 @@ describe('bit clear-cache', function () {
   // not relevant now that we disabled this feature. revisit again later if needed
   describe.skip('fs cache corrupted', () => {
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       helper.fixtures.populateComponents(1);
       helper.command.status(); // to populate the cache.
 

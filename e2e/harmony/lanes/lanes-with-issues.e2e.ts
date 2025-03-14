@@ -1,5 +1,5 @@
 import chai, { expect } from 'chai';
-import Helper from '../../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 
@@ -14,7 +14,7 @@ describe('lanes with various issues', function () {
   });
   describe('issue - object of head of main is missing from the filesystem and remote', () => {
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       helper.fixtures.populateComponents(3);
       helper.command.tagWithoutBuild();
       const comp2Head = helper.command.getHead('comp2');

@@ -1,7 +1,7 @@
 import path from 'path';
 import chai, { expect } from 'chai';
 import fs from 'fs-extra';
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-string'));
 
@@ -17,7 +17,7 @@ describe('set-peer', function () {
   describe('a component is a peer dependency', () => {
     let workspaceCapsulesRootDir: string;
     before(() => {
-      helper.scopeHelper.reInitLocalScope();
+      helper.scopeHelper.reInitWorkspace();
       helper.fixtures.populateComponents(2);
       helper.command.setPeer('comp2', '0');
       helper.command.install();
@@ -128,7 +128,7 @@ describe('set-peer using just the version range prefix', function () {
   describe('a component is a peer dependency', () => {
     let workspaceCapsulesRootDir: string;
     before(() => {
-      helper.scopeHelper.reInitLocalScope();
+      helper.scopeHelper.reInitWorkspace();
       helper.fixtures.populateComponents(2);
       helper.command.setPeer('comp2', '^');
       helper.command.install();
@@ -226,7 +226,7 @@ describe('set-peer for existing component', function () {
   describe('a component is a peer dependency', () => {
     let workspaceCapsulesRootDir: string;
     before(() => {
-      helper.scopeHelper.reInitLocalScope();
+      helper.scopeHelper.reInitWorkspace();
       helper.fixtures.populateComponents(2);
       helper.command.install();
       helper.command.snapAllComponents();

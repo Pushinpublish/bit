@@ -1,8 +1,6 @@
 import chai, { expect } from 'chai';
 
-import Helper from '../../src/e2e-helper/e2e-helper';
-import { DEFAULT_OWNER } from '../../src/e2e-helper/e2e-scopes';
-import NpmCiRegistry, { supportNpmCiRegistryTesting } from '../npm-ci-registry';
+import { Helper, DEFAULT_OWNER, NpmCiRegistry, supportNpmCiRegistryTesting } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 
@@ -22,7 +20,7 @@ describe('update-dependencies command', function () {
     let secondRemoteName: string;
     let secondScopeBeforeUpdate: string;
     before(async () => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       scopeWithoutOwner = helper.scopes.remoteWithoutOwner;
       helper.fixtures.populateComponents(1);
       npmCiRegistry = new NpmCiRegistry(helper);
@@ -161,7 +159,7 @@ describe('update-dependencies command', function () {
     let secondRemoteName: string;
     let headSnapComp2: string;
     before(async () => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       // original scope
       const secondRemote = helper.scopeHelper.getNewBareScope(undefined, true);
       secondRemotePath = secondRemote.scopePath;

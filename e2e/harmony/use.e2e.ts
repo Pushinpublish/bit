@@ -1,5 +1,5 @@
 import chai, { expect } from 'chai';
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 chai.use(require('chai-string'));
@@ -15,7 +15,7 @@ describe('bit use command', function () {
   });
   describe('when the aspect is new', () => {
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       helper.command.create('bit-aspect', 'my-aspect');
     });
     it('should not throw an error', () => {

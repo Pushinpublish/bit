@@ -2,8 +2,7 @@ import chai, { expect } from 'chai';
 import { isEmpty } from 'lodash';
 
 import { AlreadyExistsError } from '../../scopes/workspace/workspace/component-config-file/exceptions';
-import GeneralHelper from '../../src/e2e-helper/e2e-general-helper';
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper, GeneralHelper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 
@@ -22,7 +21,7 @@ describe('component config', function () {
   });
   describe('eject config', () => {
     before(() => {
-      helper.scopeHelper.reInitLocalScope({ addRemoteScopeAsDefaultScope: false });
+      helper.scopeHelper.reInitWorkspace({ addRemoteScopeAsDefaultScope: false });
       helper.fixtures.createComponentBarFoo();
       helper.fixtures.addComponentBarFoo();
     });
@@ -144,7 +143,7 @@ describe('component config', function () {
     let output;
     let configuredExtensions;
     before(() => {
-      helper.scopeHelper.reInitLocalScope({ addRemoteScopeAsDefaultScope: false });
+      helper.scopeHelper.reInitWorkspace({ addRemoteScopeAsDefaultScope: false });
       helper.fixtures.populateExtensions(5);
       helper.fixtures.createComponentBarFoo();
       helper.fixtures.addComponentBarFoo();

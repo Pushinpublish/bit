@@ -1,6 +1,6 @@
 import chai, { expect } from 'chai';
-import { Extensions } from '../../src/constants';
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Extensions } from '@teambit/legacy.constants';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 chai.use(require('chai-string'));
@@ -16,7 +16,7 @@ describe('env', function () {
   });
   describe('run bit env set and then tag when the variants points to another env', () => {
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       helper.extensions.addExtensionToVariant('*', 'teambit.react/react', undefined, true);
       helper.fixtures.populateComponents(1);
       helper.command.setEnv('comp1', 'teambit.harmony/aspect');
@@ -38,7 +38,7 @@ describe('env', function () {
   });
   describe('run bit env set X and then bit env set Y', () => {
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       helper.fixtures.populateComponents(1);
       helper.command.setEnv('comp1', 'teambit.harmony/aspect');
       helper.command.setEnv('comp1', 'teambit.react/react');
@@ -50,7 +50,7 @@ describe('env', function () {
   });
   describe('run bit env set when there is a component.json', () => {
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       helper.fixtures.populateComponents(1);
       helper.command.ejectConf('comp1');
       helper.command.setEnv('comp1', 'teambit.harmony/aspect');

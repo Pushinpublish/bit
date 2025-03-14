@@ -2,14 +2,14 @@ import { loadBit } from '@teambit/bit';
 import { ScopeAspect, ScopeMain } from '@teambit/scope';
 import { Workspace, WorkspaceAspect } from '@teambit/workspace';
 import { expect } from 'chai';
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 describe('loadBit()', function () {
   this.timeout(0);
   let helper: Helper;
   before(() => {
     helper = new Helper();
-    helper.scopeHelper.setNewLocalAndRemoteScopes();
+    helper.scopeHelper.setWorkspaceWithRemoteScope();
   });
 
   it('should return a valid workspace instance', async () => {
@@ -37,7 +37,7 @@ describe('loadBit()', function () {
   });
 
   it('should throw when defaultScope is invalid', async () => {
-    helper.scopeHelper.setNewLocalAndRemoteScopes();
+    helper.scopeHelper.setWorkspaceWithRemoteScope();
     const workspaceJsonc = helper.workspaceJsonc.read();
     workspaceJsonc['teambit.workspace/workspace'].defaultScope = 'hi/';
     helper.workspaceJsonc.write(workspaceJsonc);

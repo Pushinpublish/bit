@@ -1,6 +1,6 @@
 import chai, { expect } from 'chai';
 
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 chai.use(require('chai-string'));
@@ -16,7 +16,7 @@ describe('preview feature (during build)', function () {
   });
   describe('jsx component', () => {
     before(() => {
-      helper.scopeHelper.setNewLocalAndRemoteScopes({ disablePreview: false });
+      helper.scopeHelper.setWorkspaceWithRemoteScope({ disablePreview: false });
       helper.fs.outputFile(
         'button/button.jsx',
         `import React from 'react'

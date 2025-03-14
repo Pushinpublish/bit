@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import * as path from 'path';
 
 import { DiagnosisNotFound } from '@teambit/doctor';
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 
@@ -18,7 +18,7 @@ describe('bit doctor infra', function () {
   });
 
   before(() => {
-    helper.scopeHelper.reInitLocalScope();
+    helper.scopeHelper.reInitWorkspace();
   });
 
   describe('run all diagnoses', () => {

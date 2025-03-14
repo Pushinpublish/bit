@@ -1,6 +1,6 @@
 import path from 'path';
 import chai, { expect } from 'chai';
-import Helper from '../../src/e2e-helper/e2e-helper';
+import { Helper } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 
@@ -15,7 +15,7 @@ describe('uninstall command', function () {
   });
   describe('root policies removed', function () {
     before(() => {
-      helper.scopeHelper.reInitLocalScope();
+      helper.scopeHelper.reInitWorkspace();
       helper.command.install('is-positive@1.0.0 is-negative@1.0.0 is-odd@1.0.0');
       helper.command.uninstall('is-positive is-negative');
     });

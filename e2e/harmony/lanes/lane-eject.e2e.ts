@@ -1,8 +1,6 @@
 import chai, { expect } from 'chai';
 import path from 'path';
-import NpmCiRegistry, { supportNpmCiRegistryTesting } from '../../npm-ci-registry';
-import Helper from '../../../src/e2e-helper/e2e-helper';
-import { DEFAULT_OWNER } from '../../../src/e2e-helper/e2e-scopes';
+import { Helper, DEFAULT_OWNER, NpmCiRegistry, supportNpmCiRegistryTesting } from '@teambit/legacy.e2e-helper';
 
 chai.use(require('chai-fs'));
 
@@ -20,7 +18,7 @@ describe('bit lane command', function () {
     let scopeWithoutOwner: string;
     before(async () => {
       helper = new Helper({ scopesOptions: { remoteScopeWithDot: true } });
-      helper.scopeHelper.setNewLocalAndRemoteScopes();
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
       scopeWithoutOwner = helper.scopes.remoteWithoutOwner;
       helper.fixtures.populateComponents(3);
       npmCiRegistry = new NpmCiRegistry(helper);
@@ -70,6 +68,19 @@ describe('bit lane command', function () {
         const ids = listScope.map((l) => l.id);
         expect(ids).to.include(`${helper.scopes.remote}/comp1`);
       });
+    });
+  });
+  describe('eject when there is no main version', () => {
+    before(() => {
+      helper.scopeHelper.setWorkspaceWithRemoteScope();
+      helper.fixtures.populateComponents(1);
+      helper.command.createLane();
+      helper.command.snapAllComponentsWithoutBuild();
+      helper.command.export();
+    });
+    it('should throw an error saying it has no main version', () => {
+      const error = helper.general.runWithTryCatch('bit lane eject comp1');
+      expect(error).to.have.string('it has no main version');
     });
   });
 });
